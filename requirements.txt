@@ -89,6 +89,7 @@ PyYAML==6.0.3
 pyzmq==27.1.0
 referencing==0.37.0
 requests==2.34.2
+requests-futures==1.0.2
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rfc3987-syntax==1.1.0
@@ -100,6 +101,7 @@ stack-data==0.6.3
 terminado==0.18.1
 tinycss2==1.5.1
 tornado==6.5.8
+tqdm==4.70.0
 traitlets==5.16.1
 typing_extensions==4.16.0
 tzdata==2026.3
@@ -111,4 +113,5 @@ webencodings==0.5.1
 websocket-client==1.9.0
 websockets==17.0.1
 widgetsnbextension==4.0.15
+yahooquery==2.4.1
 yfinance==1.6.0
