@@ -1,5 +1,4 @@
 import yfinance as yf
-from yahooquery import search
 def load_stock_data(symbol,period="1y",interval="1d"):
     """
     IMPORTS DATA FROM YFINANCE GIVEN THE TICKER OR NAME OF THE COMPANY for 1 year

@@ -5,11 +5,11 @@ def data_clean(df):
     """
     to drop rows with a majority of NaN values and remove duplicate rows
     parameters:df pandas.DataFrame
-    returns:final_df pandas.DataFrame
+    returns:cleaned df pandas.DataFrame
     1)drop data rows with NaN in Close values
     2)only OHLCV values matter so drop a row if majority of those are NaN
     3)take rows from ohlcv cleaned data and select only thsoe rows from df
-    3)handle duplicates later
+    3)handle duplicates-just remove exact duplicate rows with same dates
     """
     ##dropping Close NaN rows
     df=df.drop(df.index[df["Close"].isna()])
@@ -26,21 +26,30 @@ def data_clean(df):
         if (df.index[i] not in ohlcv.index):
             rows_to_drop_indf.append(df.index[i])
     df.drop(rows_to_drop_indf,inplace=True) 
+    #handling duplicates
+    if (df.index.duplicated().sum())!=0:
+        df=df[~df.index.duplicated(keep="first")]
     return(df)
     
 
 # #testing
-# df=yf.Ticker("AAPL").history(period="1y")
-# bad_df = df.copy()
+df=yf.Ticker("AAPL").history(period="1y")
+bad_df = df.copy()
 
-# # 1 Close NaN
-# bad_df.loc[bad_df.index[5], "Close"] = np.nan
+# 1 Close NaN
+bad_df.loc[bad_df.index[5], "Close"] = np.nan
 
-# # 2 NaNs in the OHLCV columns
-# bad_df.loc[bad_df.index[10], ["Open", "High", "Low"]] = np.nan
+# 2 NaNs in the OHLCV columns
+bad_df.loc[bad_df.index[10], ["Open", "High", "Low"]] = np.nan
 
-# # 3 Another row with 3 NaNs
-# bad_df.loc[bad_df.index[15], ["Open", "Close", "Volume"]] = np.nan
+# 3 Another row with 3 NaNs
+bad_df.loc[bad_df.index[15], ["Open", "Close", "Volume"]] = np.nan
+bad_df = pd.concat([bad_df, bad_df.iloc[[10]]])
 
-# cleaned_df=data_clean(bad_df)
-# print(cleaned_df.isna().sum(),"\n\n")
+# Change the duplicate's Close value
+bad_df.iloc[-1, bad_df.columns.get_loc("Close")] = 999
+
+cleaned_df=data_clean(bad_df)
+print("duplicates=",bad_df.index.duplicated().sum())
+print("NaN=",bad_df.isna().sum())
+print(cleaned_df.isna().sum(),"\n\n")
