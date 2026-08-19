@@ -14,7 +14,7 @@ def data_clean(df):
     ##dropping Close NaN rows
     df=df.drop(df.index[df["Close"].isna()])
     ##dropping rows with 3 or more/5 NaN values in a row in ohlcv
-    ohlcv=df[["Open","High","Low","Close","Volume"]]
+    ohlcv=df[["Open","High","Low","Close","Volume"]].copy()
     rows_to_drop=[]#cannot drop rows from original database in loop  because then the index positions change
     for i in range(len(ohlcv)):
         if (ohlcv.iloc[i,:].isna().sum())>=3:
@@ -32,24 +32,24 @@ def data_clean(df):
     return(df)
     
 
-# #testing
-df=yf.Ticker("AAPL").history(period="1y")
-bad_df = df.copy()
+# # #testing
+# df=yf.Ticker("AAPL").history(period="1y")
+# bad_df = df.copy()
 
-# 1 Close NaN
-bad_df.loc[bad_df.index[5], "Close"] = np.nan
+# # 1 Close NaN
+# bad_df.loc[bad_df.index[5], "Close"] = np.nan
 
-# 2 NaNs in the OHLCV columns
-bad_df.loc[bad_df.index[10], ["Open", "High", "Low"]] = np.nan
+# # 2 NaNs in the OHLCV columns
+# bad_df.loc[bad_df.index[10], ["Open", "High", "Low"]] = np.nan
 
-# 3 Another row with 3 NaNs
-bad_df.loc[bad_df.index[15], ["Open", "Close", "Volume"]] = np.nan
-bad_df = pd.concat([bad_df, bad_df.iloc[[10]]])
+# # 3 Another row with 3 NaNs
+# bad_df.loc[bad_df.index[15], ["Open", "Close", "Volume"]] = np.nan
+# bad_df = pd.concat([bad_df, bad_df.iloc[[10]]])
 
-# Change the duplicate's Close value
-bad_df.iloc[-1, bad_df.columns.get_loc("Close")] = 999
+# # Change the duplicate's Close value
+# bad_df.iloc[-1, bad_df.columns.get_loc("Close")] = 999
 
-cleaned_df=data_clean(bad_df)
-print("duplicates=",bad_df.index.duplicated().sum())
-print("NaN=",bad_df.isna().sum())
-print(cleaned_df.isna().sum(),"\n\n")
+# cleaned_df=data_clean(bad_df)
+# print("duplicates=",bad_df.index.duplicated().sum())
+# print("NaN=",bad_df.isna().sum())
+# print(cleaned_df.isna().sum(),"\n\n")
