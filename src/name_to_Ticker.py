@@ -27,6 +27,6 @@ def name_to_ticker(user_in):
 
 
 
-#TESTING
-a=input("enter company name:")
-name_to_ticker(a)
+# #TESTING
+# a=input("enter company name:")
+# name_to_ticker(a)

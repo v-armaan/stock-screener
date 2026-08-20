@@ -1,7 +1,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import calculations
+from . import calculations
 import yfinance as yf
 """
 plots for price,smaema,bollinger band
@@ -230,6 +230,6 @@ def plot_obv(df):
 
     return fig_obv
 #testing
-df=yf.Ticker("AAPL").history(period="1y")
-obv=plot_obv(df)
-obv.show()
+# df=yf.Ticker("AAPL").history(period="1y")
+# obv=plot_obv(df)
+# obv.show()
