@@ -28,4 +28,5 @@ def name_to_ticker(user_in):
 
 
 #TESTING
-# name_to_ticker("microsoft")
+a=input("enter company name:")
+name_to_ticker(a)
