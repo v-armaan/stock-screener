@@ -10,7 +10,7 @@ plot for atr
 plot for macd
 plot for obv
 """
-#REMOVE NON TRADING DAYS FUNCTION
+#REMOVE NON TRADING DAYS FUNCTION,helper function
 def remove_non_trading_days(fig, df):
 
     all_days = pd.date_range(
@@ -35,7 +35,7 @@ def remove_non_trading_days(fig, df):
 
 
 def price_sma_ema_volume_bb(df):
-    fig=make_subplots(shared_xaxes=True,rows=2,cols=1)
+    fig=make_subplots(shared_xaxes=True,rows=2,cols=1,row_heights=[0.85, 0.15],vertical_spacing=0)
     fig.add_trace(go.Candlestick(x=df.index,open=df["Open"],high=df["High"],low=df["Low"],close=df["Close"],name="PRICE"),row=1,col=1)
     ma=calculations.calculate_moving_averages(df)
     bb=calculations.calculate_bollinger_bands(df)
@@ -80,8 +80,8 @@ def price_sma_ema_volume_bb(df):
         col=1
     )
     fig.update_layout(
-        height=800,
-        xaxis_rangeslider_visible=False,
+        height=1000,
+        xaxis_rangeslider_visible=False
     )
     fig=remove_non_trading_days(fig,df)
 

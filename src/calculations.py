@@ -136,8 +136,15 @@ def calc_52w_metrics(df):
     metrics_52w["distance_from_high"] = ((df["Close"] - metrics_52w["52_week_high"])/ metrics_52w["52_week_high"]) * 100
     metrics_52w["distance_from_low"] = ((df["Close"] - metrics_52w["52_week_low"])/ metrics_52w["52_week_low"]) * 100
     return(metrics_52w)
-
-    
+def calculate_all(df):
+    price_metrics=calculate_price_metrics(df)
+    moving_averages=calculate_moving_averages(df)
+    rsi=calc_rsi(df)
+    atr=calculate_atr(df)
+    macd=calculate_macd(df)
+    volume=volume_metrics(df)
+    calculated_df=pd.concat([df["Close"],price_metrics["daily_return"],price_metrics["cumulative_return"],moving_averages,rsi,atr,macd,volume["OBV"]],axis=1)
+    return(calculated_df)
     
 
         

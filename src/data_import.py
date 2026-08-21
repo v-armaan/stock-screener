@@ -1,5 +1,5 @@
 import yfinance as yf
-def load_stock_data(symbol,period="1y",interval="1d"):
+def load_stock_data(symbol,period):
     """
     IMPORTS DATA FROM YFINANCE GIVEN THE TICKER OR NAME OF THE COMPANY for 1 year
     parameters:
