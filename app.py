@@ -36,6 +36,9 @@ if mode == "Individual Stock Analysis":
         if "selected_ticker" in st.session_state:
             selected_ticker=st.session_state.selected_ticker
             st.write("Selected Ticker:",selected_ticker)
+            if st.button("Search a different stock"):
+                del st.session_state.selected_ticker
+                st.rerun()
         else:
             st.subheader("Search for a stock")
             search_query = st.text_input("Enter company name or ticker")
@@ -91,22 +94,22 @@ if mode == "Individual Stock Analysis":
             fig=price_sma_ema_volume_bb(df)
             st.plotly_chart(fig,use_container_width=True)
             st.subheader("Momentum")
-            st.metric("RSI 14",f"{latest["RSI"]:.2f}")
+            st.metric("RSI 14",f"{latest['RSI']:.2f}")
             col1,col2,col3=st.columns(3)
 
             with col1:
-                st.metric("MACD",f"{latest["MACD"]:.2f}")
+                st.metric("MACD",f"{latest['MACD']:.2f}")
             with col2:
-                st.metric("MACD Signal",f"{latest["MACD_SIGNAL"]:.2f}")
+                st.metric("MACD Signal",f"{latest['MACD_SIGNAL']:.2f}")
             with col3:
-                st.metric("MACD Histogram",f"{latest["MACD_HISTOGRAM"]:.2f}")
+                st.metric("MACD Histogram",f"{latest['MACD_HISTOGRAM']:.2f}")
             fig_rsi=plot_rsi(df)
             st.plotly_chart(fig_rsi)
             fig_macd=plot_macd(df)
             st.plotly_chart(fig_macd)
             #plotting volatility indicators
             st.subheader("Volatility")
-            st.metric("ATR 14",f"{latest["atr"]:.2f}")
+            st.metric("ATR 14",f"{latest['atr']:.2f}")
             fig_atr=plot_atr(df)
             st.plotly_chart(fig_atr)
             st.subheader("Volume")
@@ -119,6 +122,12 @@ elif mode == "Stock Screener":
         "CHOOSE AN INDEX OR CREATE CUSTOM LIST:",
         ["S&P500", "NIFTY50", "SENSEX", "CUSTOM LIST"]
     )
+
+    custom_tickers_input = ""
+    if screen_choice == "CUSTOM LIST":
+        custom_tickers_input = st.text_input(
+            "Enter tickers separated by commas (e.g. AAPL, MSFT, TSLA)"
+        )
 
     period = st.radio(
         "Select Period for data",
@@ -191,73 +200,69 @@ elif mode == "Stock Screener":
     def add_condition():
         st.session_state.condition_counter+=1
     st.button("Add Condition",on_click=add_condition)
+
         # SCREENING
     if st.button("Screen Stocks"):
+        tickers = []
         if screen_choice == "S&P500":
             tickers = get_sp500()
-            with st.spinner("Downloading and Screening S&P500 stocks..."):
+        elif screen_choice == "NIFTY50":
+            tickers = get_nifty50()
+        elif screen_choice == "SENSEX":
+            tickers = get_sensex()
+        elif screen_choice == "CUSTOM LIST":
+            tickers = [
+                t.strip().upper()
+                for t in custom_tickers_input.split(",")
+                if t.strip() != ""
+            ]
+
+        if len(tickers) == 0:
+            st.warning("No tickers to screen. Please provide at least one ticker.")
+        else:
+            with st.spinner(f"Downloading and Screening {screen_choice} stocks..."):
                 st.session_state.stored_df = screen_stocks(
                     tickers,
                     conditions,
                     period
                 )
 
-        # DISPLAY RESULTS
-        if "stored_df" in st.session_state:
-            display_df = pd.DataFrame()
-            show_all = st.checkbox("Show all metrics")
-            if show_all:
-                for ticker in st.session_state.stored_df:
-                    latest = st.session_state.stored_df[ticker]["calculated"].iloc[-1]
-                    latest["Ticker"] = ticker
-                    display_df = pd.concat(
-                        [display_df, latest.to_frame().T],
-                        ignore_index=True
-                    )
-            else:
-                metrics = []
-                for condition in conditions:
-                    if condition[0] not in metrics:
-                        metrics.append(condition[0])
-                for ticker in st.session_state.stored_df:
-                    latest = st.session_state.stored_df[ticker]["calculated"].iloc[-1]
-                    latest = latest[metrics]
-                    latest["Ticker"] = ticker
-                    display_df = pd.concat(
-                        [display_df, latest.to_frame().T],
-                        ignore_index=True
-                    )
-            display_df.insert(0, "Ticker", display_df.pop("Ticker"))
-            st.dataframe(
-                display_df,
-                height="content"
-            )
-            #switching modes
-            st.subheader("For detailed analysis of a stock in the screened list select its ticker and click on more info")
-            st.session_state.selected_ticker = st.selectbox("Select stock",list(st.session_state.stored_df.keys()),width=150)
-            def switch_to_individual():
-                st.session_state.mode="Individual Stock Analysis"
-                return()
-            st.button("More Info",on_click=switch_to_individual)
-        
-    
-    
-                
-            
-            
-            
-        # elif screen_choice=="NIFTY50":
-        #     tickers=get_nifty50()
-        # elif screen_choice=="SENSEX":
-        #     tickers=get_sensex()
-        # elif screen_choice=="CUSTOM LIST":
-            
-        
-        
-                
-        
-            
-    
-        
-            
-    
+    # DISPLAY RESULTS - outside the "Screen Stocks" button block so it
+    # survives reruns triggered by the checkbox / selectbox / More Info button
+    if "stored_df" in st.session_state:
+        display_df = pd.DataFrame()
+        show_all = st.checkbox("Show all metrics")
+        if show_all:
+            for ticker in st.session_state.stored_df:
+                latest = st.session_state.stored_df[ticker]["calculated"].iloc[-1]
+                latest["Ticker"] = ticker
+                display_df = pd.concat(
+                    [display_df, latest.to_frame().T],
+                    ignore_index=True
+                )
+        else:
+            metrics = []
+            for condition in conditions:
+                if condition[0] not in metrics:
+                    metrics.append(condition[0])
+            for ticker in st.session_state.stored_df:
+                latest = st.session_state.stored_df[ticker]["calculated"].iloc[-1]
+                latest = latest[metrics]
+                latest["Ticker"] = ticker
+                display_df = pd.concat(
+                    [display_df, latest.to_frame().T],
+                    ignore_index=True
+                )
+        display_df.insert(0, "Ticker", display_df.pop("Ticker"))
+        st.dataframe(
+            display_df,
+            height="content"
+        )
+        #switching modes
+        st.subheader("For detailed analysis of a stock in the screened list select its ticker and click on more info")
+        chosen_ticker = st.selectbox("Select stock",list(st.session_state.stored_df.keys()),width=150)
+        def switch_to_individual():
+            st.session_state.selected_ticker = chosen_ticker
+            st.session_state.mode="Individual Stock Analysis"
+            return()
+        st.button("More Info",on_click=switch_to_individual)
