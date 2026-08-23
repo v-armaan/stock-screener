@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 from io import StringIO
 import streamlit as st
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600)#cache data for 1 hour
 def load_stock_data(symbol,period="1y"):
     """
     IMPORTS DATA FROM YFINANCE GIVEN THE TICKER OR NAME OF THE COMPANY for 1 year

@@ -22,13 +22,20 @@ import pandas as pd
 import numpy as np
 
 def calculate_price_metrics(df):
-    """Calculate daily price changes, returns, range, and cumulative return."""
+    """Calculate daily price changes, returns, range, and cumulative return (over the entire fetched period)."""
     price_metrics=pd.DataFrame()
     price_metrics["daily_change"]=df["Close"].diff()
     price_metrics["daily_return"]=df["Close"].pct_change()
     price_metrics["daily_range"]=df["High"]-df["Low"]
     price_metrics["cumulative_return"]=(df["Close"]-df["Close"].iloc[0])/(df["Close"].iloc[0])
     return(price_metrics)
+def calc_1y_return(df):
+    """Calculate price return over the trailing ~252 trading days (roughly 1 year), regardless of the selected period."""
+    one_year_return=pd.DataFrame()
+    lookback=min(len(df),252)
+    base_price=df["Close"].iloc[-lookback]
+    one_year_return["1Y_return"]=(df["Close"]-base_price)/base_price
+    return(one_year_return)
 def calculate_moving_averages(df):
     """Calculate 20, 50, and 200-day SMA and EMA values."""
     moving_averages=pd.DataFrame()
@@ -138,20 +145,11 @@ def calc_52w_metrics(df):
     return(metrics_52w)
 def calculate_all(df):
     price_metrics=calculate_price_metrics(df)
+    one_year_return=calc_1y_return(df)
     moving_averages=calculate_moving_averages(df)
     rsi=calc_rsi(df)
     atr=calculate_atr(df)
     macd=calculate_macd(df)
     volume=volume_metrics(df)
-    calculated_df=pd.concat([df["Close"],price_metrics["daily_return"],price_metrics["cumulative_return"],moving_averages,rsi,atr,macd,volume["OBV"]],axis=1)
+    calculated_df=pd.concat([df["Close"],price_metrics["daily_return"]*100,price_metrics["cumulative_return"]*100,one_year_return["1Y_return"]*100,moving_averages,rsi,atr,macd,volume["OBV"]],axis=1)
     return(calculated_df)
-    
-
-        
-    
-    
-    
-    
-
-
-    
