@@ -1,6 +1,6 @@
 
 import yfinance as yf
-import calculations,data_import,data_cleaning
+from src import calculations,data_import,data_cleaning
 def apply_condition(df, metric, operator, value): #to check if one condition passes
 
     latest = df.iloc[-1]
@@ -36,11 +36,11 @@ def screen_stock(df, conditions):   #to check whether all the conditions pass
             return False
 
     return True
-def screen_stocks(tickers, conditions):#handle multiple tickers and stores the required ones(those that pass the conditions)
+def screen_stocks(tickers, conditions,period):#handle multiple tickers and stores the required ones(those that pass the conditions)
     results={}
     for ticker in tickers:
         try:
-            df=data_import.load_stock_data(ticker)
+            df=data_import.load_stock_data(ticker,period)
             df=data_cleaning.data_clean(df)
             calculated_df=calculations.calculate_all(df)
             if screen_stock(calculated_df,conditions):
@@ -50,11 +50,11 @@ def screen_stocks(tickers, conditions):#handle multiple tickers and stores the r
             continue
     return results
 # #testing
-tickers = ["AAPL", "MSFT", "NVDA", "AMZN"]
-conditions = [
-    ("RSI", "<", 30),
-    ("Close", ">", "SMA_200"),
-    ("MACD", ">", "MACD_SIGNAL")
-]
-results=screen_stocks(tickers,conditions)
-print(results.keys())
+# tickers = ["AAPL", "MSFT", "NVDA", "AMZN"]
+# conditions = [
+#     ("RSI", "<", 30),
+#     ("Close", ">", "SMA_200"),
+#     ("MACD", ">", "MACD_SIGNAL")
+# ]
+# results=screen_stocks(tickers,conditions)
+# print(results.keys())
