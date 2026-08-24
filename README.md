@@ -51,14 +51,44 @@ stock-screener/
 └── requirements.txt
 ```
 
-## Setup
+## How to Run
 
+**1. Clone the repo**
 ```bash
 git clone https://github.com/v-armaan/stock-screener.git
 cd stock-screener
+```
+
+**2. Create and activate a virtual environment**
+
+macOS / Linux:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Windows:
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+You'll know it's active when your terminal prompt shows `(.venv)` at the start.
+
+**3. Install dependencies**
+```bash
 pip install -r requirements.txt
+```
+
+**4. Run the app**
+```bash
 streamlit run app.py
 ```
+
+This opens the app in your browser (usually `http://localhost:8501`).
+
+**Note:** every time you open a new terminal session to work on this project, you need to re-activate the virtual environment first (step 2) before running the app — it doesn't stay active across terminal restarts.
+
 
 ## Known Limitations
 
